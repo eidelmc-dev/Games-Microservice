@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/proyecto
+    username: postgres
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+server:
+  port: 8083
