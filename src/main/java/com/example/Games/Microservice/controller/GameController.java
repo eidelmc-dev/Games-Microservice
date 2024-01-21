@@ -27,8 +27,7 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-    @Autowired
-    private JwtokenService jwtokenService;
+
     
     @GetMapping
     public ResponseEntity<GameModel> getGame(@RequestParam(value = "id") String gameId) {
@@ -40,11 +39,7 @@ public class GameController {
     @PostMapping
     public ResponseEntity<GameModel> postGame(HttpServletRequest request, @RequestBody GameModel gameModel) {
 
-        String token = jwtokenService.extractToken(request);
-        Long userId = jwtokenService.getUserIdFromToken(token);
-
-        gameModel.setGame_user_id(userId);
-    GameModel gamePosted =  gameService.postGame(gameModel);
+    GameModel gamePosted =  gameService.postGame(request ,gameModel);
      return new ResponseEntity<>( gamePosted, HttpStatusCode.valueOf(200));
  }
     

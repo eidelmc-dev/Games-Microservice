@@ -1,9 +1,13 @@
-package com.example.Games.Microservice.services;
+package com.example.Games.Microservice.services.Impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import com.example.Games.Microservice.models.GameModel;
 import com.example.Games.Microservice.repository.GameRepository;
+import com.example.Games.Microservice.services.GameService;
+import com.example.Games.Microservice.services.JwtokenService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 
 
@@ -11,6 +15,9 @@ import com.example.Games.Microservice.repository.GameRepository;
 public class GameServiceImpl implements GameService {
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private JwtokenService jwtokenService;
 
     @Override
     public GameModel fetchGame(String gameId) {
@@ -27,25 +34,19 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public GameModel upateGame(GameModel gameModel) {
-        Long gameId = gameModel.getGame_id();
-        GameModel existingGame =  gameRepository.findById(gameId).orElseThrow(() -> new RuntimeException("Game Not Found."));
-        if (gameModel.getGame_level() != null) {
-            existingGame.setGame_level(gameModel.getGame_level());
-        }
-        if (gameModel.getGame_score() != null) {
-            existingGame.setGame_score(gameModel.getGame_score());
-        }
-        if (gameModel.getGame_user_id() != null) {
-            existingGame.setGame_user_id(gameModel.getGame_user_id());
-        }
-        existingGame.setGame_update(LocalDateTime.now());;
 
-       return gameRepository.save(existingGame);
+
+       return gameRepository.save(gameModel);
     }
 
 
     @Override
-    public GameModel postGame(GameModel gameModel) {
+    public GameModel postGame(HttpServletRequest request,GameModel gameModel) {
+        String token = jwtokenService.extractToken(request);
+        Long userId = jwtokenService.getUserIdFromToken(token);
+
+        gameModel.setGame_user_id(userId);
+
         gameModel.setGame_update(LocalDateTime.now());;
         GameModel gameSaved = gameRepository.save(gameModel);
         return gameSaved;
